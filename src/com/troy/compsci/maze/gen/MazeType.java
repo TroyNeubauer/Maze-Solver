@@ -14,7 +14,6 @@ public abstract class MazeType
 	static
 	{
 		List<String> classes = new FastClasspathScanner(EmptyMaze.class.getPackage().getName()).scan(1).getNamesOfSubclassesOf(MazeType.class);
-		System.out.println(Arrays.toString(classes.toArray()));
 		values = new ArrayList<MazeType>();
 		for (String clazz : classes)
 		{
@@ -30,24 +29,25 @@ public abstract class MazeType
 		}
 	}
 
-	List<MazeCreatorPackage> packages = new ArrayList<MazeCreatorPackage>();
-	String name;
+	public List<MazeCreatorPackage> packages = new ArrayList<MazeCreatorPackage>();
+	private String name;
 
 	public MazeType(MazeCreatorPackage... packages)
 	{
-		String rawName = this.getClass().getSimpleName(), name = "";
+		String rawName = this.getClass().getSimpleName();
+		StringBuilder sb = new StringBuilder(rawName.length());
 		boolean first = true;
 		for (char c : rawName.toCharArray())
 		{
 			if (Character.isUpperCase(c) && !first)
 			{
-				name += ' ';
+				sb.append(' ');
 			}
 			first = false;
-			name += c;
+			sb.append(c);
 		}
+		this.name = sb.toString();
 
-		this.name = name;
 		for (MazeCreatorPackage p : packages)
 		{
 			this.packages.add(p);

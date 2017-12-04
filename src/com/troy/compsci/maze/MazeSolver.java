@@ -10,6 +10,8 @@ import java.util.concurrent.*;
 
 import javax.swing.*;
 
+import org.apache.commons.io.*;
+import org.apache.commons.lang3.exception.*;
 import org.lwjgl.*;
 import org.lwjgl.opengl.*;
 
@@ -32,8 +34,8 @@ public class MazeSolver extends JFrame
 	private final JLabel sliderValue = new JLabel("not set yet");
 	private final JComboBox<SolverType> solverTypeBox = new JComboBox<SolverType>();
 	private final BooleanButon running = new BooleanButon("Stop", "Start", false);
-	private final JButton reset = new JButton("Reset");
-	
+	private final JButton reset = new JButton("Reset"), saveMaze = new JButton("Save Maze");
+
 	private CreateNewMazeFrame createNewMaze;
 
 	private static final NumberFormat FORMAT = NumberFormat.getNumberInstance(Locale.US);
@@ -45,11 +47,14 @@ public class MazeSolver extends JFrame
 	public MazeSolver()
 	{
 		super("Troy's Maze solver - November 2017");
-		try {
+		try
+		{
 			File file = new File("./test.maze");
-			MazeEncoding.writeMaze(maze,file);
+			MazeEncoding.writeMaze(maze, file);
 			maze = MazeEncoding.readMaze(file);
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
 		}
 		try
@@ -105,12 +110,32 @@ public class MazeSolver extends JFrame
 				startMaze();
 			}
 		});
-		reset.addActionListener((e) -> {
+		saveMaze.addActionListener((e) ->
+		{
+			JFileChooser ch = new JFileChooser();
+			ch.setFileFilter(new MazeFileFilter());
+			int result = ch.showOpenDialog(this);
+			if (result == JFileChooser.APPROVE_OPTION)
+			{
+				try
+				{
+					MazeEncoding.writeMaze(maze, ch.getSelectedFile());
+				}
+				catch (IOException e1)
+				{
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(this, ExceptionUtils.getStackTrace(e1), "Unable to save maze!", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		reset.addActionListener((e) ->
+		{
 			maze.reset();
 			needsRepaint = true;
 		});
-		generateNewMaze.addActionListener((e) -> {
-			if(createNewMaze == null) createNewMaze = new CreateNewMazeFrame(this);
+		generateNewMaze.addActionListener((e) ->
+		{
+			if (createNewMaze == null) createNewMaze = new CreateNewMazeFrame(this);
 			createNewMaze.setVisible(true);
 		});
 		while (true)
@@ -170,7 +195,7 @@ public class MazeSolver extends JFrame
 		maze.setAlgorithm(algorithm);
 		maze.solve();
 	}
-	
+
 	/**
 	 * @param maze the maze to set
 	 */
@@ -178,7 +203,7 @@ public class MazeSolver extends JFrame
 	{
 		this.maze = maze;
 	}
-	
+
 	/**
 	 * @return the maze
 	 */
@@ -212,6 +237,8 @@ public class MazeSolver extends JFrame
 			this.add(reset, g);
 			g.gridx++;
 			this.add(running, g);
+			g.gridx++;
+			this.add(saveMaze, g);
 		}
 	}
 
@@ -236,7 +263,8 @@ public class MazeSolver extends JFrame
 	 */
 	public long getSlowDownMicroSeconds()
 	{
-		return (int) (Math.pow(((double) ((slider.getMaximum() - slider.getMinimum()) - slider.getValue()) / slider.getMaximum()), (STEEPNESS)) * slider.getMaximum());
+		return (int) (Math.pow(((double) ((slider.getMaximum() - slider.getMinimum()) - slider.getValue()) / slider.getMaximum()), (STEEPNESS))
+				* slider.getMaximum());
 	}
 
 	/**

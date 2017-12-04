@@ -14,7 +14,7 @@ public class RandomWalls extends MazeType
 	@Override
 	public Maze create()
 	{
-		return null;
+		return MazeCreator.randomWalls(MazeCreatorPackage.WIDTH_AND_HEIGHT.width, MazeCreatorPackage.WIDTH_AND_HEIGHT.height);
 	}
 
 }

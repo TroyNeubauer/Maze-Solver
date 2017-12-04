@@ -7,17 +7,37 @@ import javax.swing.*;
 
 public class FileMazeCreatorPackage extends MazeCreatorPackage
 {
-	public JTextField file = new JTextField();
+
+	public FileMazeCreatorPackage()
+	{
+		super("File Maze");
+	}
+
+	public JTextField file = new JTextField(30);
 	private JButton chooseFile = new JButton("Choose File");
 
 	@Override
-	public void addComponets(JPanel panel, GridBagConstraints g)
+	public void addComponets(GridBagConstraints g)
 	{
-		panel.add(file, g);
-		g.gridy++;
-		panel.add(chooseFile, g);
-		g.gridy++;
-
+		g.gridy = 0;
+		g.gridx = 0;
+		g.gridwidth = GridBagConstraints.RELATIVE;
+		g.gridheight = GridBagConstraints.RELATIVE;
+		add(new JLabel("File: "), g);
+		
+		g.gridy = 0;
+		g.gridx = 1;
+		g.gridwidth = GridBagConstraints.REMAINDER;
+		g.gridheight = GridBagConstraints.RELATIVE;
+		add(file, g);
+		
+		
+		g.gridy = 1;
+		g.gridx = 0;
+		g.gridwidth = GridBagConstraints.REMAINDER;
+		g.gridheight = GridBagConstraints.REMAINDER;
+		add(chooseFile, g);
+		
 		chooseFile.addActionListener((e) ->
 		{
 			JFileChooser fc = new JFileChooser();

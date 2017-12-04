@@ -22,8 +22,13 @@ import javax.swing.*;
  */
 public class WAHMazeCreatorPackage extends MazeCreatorPackage
 {
+	public WAHMazeCreatorPackage()
+	{
+		super("Width And Height Maze");
+	}
+
 	private JTextField widthField = new JTextField(5), heightField = new JTextField(5);
-	protected int width, height;
+	public int width, height;
 
 	public String checkRequiredValues()
 	{
@@ -49,21 +54,31 @@ public class WAHMazeCreatorPackage extends MazeCreatorPackage
 	}
 
 	@Override
-	public void addComponets(JPanel panel, GridBagConstraints g)
+	public void addComponets(GridBagConstraints g)
 	{
-		panel.add(new JLabel("Width"), g);
-		int defaultX = g.gridx;
-		g.gridx++;
+		g.gridwidth = GridBagConstraints.RELATIVE;
+		g.gridheight = GridBagConstraints.RELATIVE;
+		
+		g.gridx = 0;
+		g.gridy = 0;
+		add(new JLabel("Width: "), g);
 
-		panel.add(widthField, g);
-		g.gridy++;
-		g.gridx = defaultX;
+		g.gridwidth = GridBagConstraints.REMAINDER;
+		g.gridheight = GridBagConstraints.RELATIVE;
+		g.gridx = 1;
+		g.gridy = 0;
+		add(widthField, g);
 
-		panel.add(new JLabel("Height"), g);
-		g.gridx++;
+		g.gridwidth = GridBagConstraints.RELATIVE;
+		g.gridheight = GridBagConstraints.REMAINDER;
+		g.gridx = 0;
+		g.gridy = 1;
+		add(new JLabel("Height: "), g);
 
-		panel.add(heightField, g);
-		g.gridy++;
-		g.gridx = defaultX;
+		g.gridwidth = GridBagConstraints.REMAINDER;
+		g.gridheight = GridBagConstraints.REMAINDER;
+		g.gridx = 1;
+		g.gridy = 1;
+		add(heightField, g);
 	}
 }

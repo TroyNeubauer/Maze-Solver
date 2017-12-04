@@ -9,6 +9,7 @@ public class MazeEncoding
 {
 	private static final byte PATH = 0, WALL = 1;
 	private static final byte HEADER = 'M';
+	public static final String EXTENSION = "maze";
 
 	public static Maze readMaze(File file) throws IOException
 	{
@@ -49,6 +50,12 @@ public class MazeEncoding
 
 	public static void writeMaze(Maze maze, File dest) throws IOException
 	{
+		String file = dest.getName();
+		if (FilenameUtils.getExtension(file) != EXTENSION)
+		{
+			int dot = file.lastIndexOf('.');
+			dest = new File(dest.getParentFile(), file.substring(0, (dot == -1) ? file.length() : dot) + '.' + EXTENSION);
+		}
 		FileOutputStream stream = new FileOutputStream(dest);
 
 		stream.write(HEADER);
@@ -107,7 +114,7 @@ public class MazeEncoding
 			throw new RuntimeException("Unexpected IOException while compressing!", e);
 		}
 	}
-	
+
 	private static byte[] decompress(byte[] src)
 	{
 		try

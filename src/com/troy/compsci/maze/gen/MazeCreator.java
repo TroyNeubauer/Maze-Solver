@@ -105,7 +105,7 @@ public class MazeCreator
 
 		}
 		while (!xValues.empty());
-
+		maze.setLocations(1, 1, width - 2, height - 2);
 		return maze;
 	}
 

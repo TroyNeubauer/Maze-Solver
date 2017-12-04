@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.swing.*;
 
-public abstract class MazeCreatorPackage
+public abstract class MazeCreatorPackage extends JPanel
 {
 	public static final MazeCreatorPackage[] PACKAGES;
 
@@ -20,7 +20,6 @@ public abstract class MazeCreatorPackage
 		int count = 0;
 		for (Field field : MazeCreatorPackage.class.getDeclaredFields())
 		{
-			System.out.println("f" + field.toString());
 			if (Modifier.isStatic(field.getModifiers()) && MazeCreatorPackage.class.isAssignableFrom(field.getType()))
 			{
 				count++;
@@ -43,13 +42,22 @@ public abstract class MazeCreatorPackage
 			}
 		}
 	}
+	
+	private String name;
+
+	public MazeCreatorPackage(String name)
+	{
+		super(new GridBagLayout());
+		this.setPreferredSize(new Dimension(500, 350));
+		this.name = name;
+	}
+	
 
 	/**
 	 * Adds all components that the user needs to interact with to {@code panel}
-	 * @param panel The panel to add all the components to
 	 * @param g Constraints that should be used when adding 
 	 */
-	public abstract void addComponets(JPanel panel, GridBagConstraints g);
+	public abstract void addComponets(GridBagConstraints g);
 
 	/**
 	 * Checks that all values required by this package are valid
@@ -60,6 +68,7 @@ public abstract class MazeCreatorPackage
 
 	public void disableAllComponents()
 	{
+		this.setEnabled(false);
 		for (Component c : getAllComponets())
 		{
 			c.setEnabled(false);
@@ -68,6 +77,7 @@ public abstract class MazeCreatorPackage
 
 	public void enableAllComponents()
 	{
+		this.setEnabled(true);
 		for (Component c : getAllComponets())
 		{
 			c.setEnabled(true);
@@ -81,9 +91,10 @@ public abstract class MazeCreatorPackage
 
 	private List<Component> getAllComponets(Class<?> clazz, ArrayList<Component> list)
 	{
-		for (Field field : clazz.getFields())
+		for (Field field : clazz.getDeclaredFields())
 		{
-			if (!Modifier.isStatic(field.getModifiers()) && field.getType().isAssignableFrom(Component.class))
+			field.setAccessible(true);
+			if (!Modifier.isStatic(field.getModifiers()) && Component.class.isAssignableFrom(field.getType()))
 			{
 				try
 				{
@@ -94,8 +105,14 @@ public abstract class MazeCreatorPackage
 				}
 			}
 		}
-		if (clazz.getSuperclass() != MazeCreatorPackage.class) { return getAllComponets(this.getClass().getSuperclass(), list); }
 		return list;
+	}
+
+	/**
+	 * @return The name of this package ()
+	 */
+	public String getName() {
+		return name;
 	}
 
 }
