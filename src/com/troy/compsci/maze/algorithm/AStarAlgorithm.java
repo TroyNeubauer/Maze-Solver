@@ -6,6 +6,7 @@ import com.troy.compsci.maze.*;
 
 public class AStarAlgorithm extends MazeAlgorithm
 {
+
 	List<Node> openList = new LinkedList<Node>();
 
 	@Override
@@ -32,7 +33,7 @@ public class AStarAlgorithm extends MazeAlgorithm
 			}
 			maze.maze[x + y * width] = Maze.CLOSED;//mark as closed because we are done with this one
 
-			if (sleep()) return false;
+			idle();
 			maze.steps++;
 
 			Node neighbor;//try to create new neighbors
@@ -166,9 +167,6 @@ public class AStarAlgorithm extends MazeAlgorithm
 			return true;
 		}
 
-		/* (non-Javadoc)
-		 * @see java.lang.Object#toString()
-		 */
 		@Override
 		public String toString()
 		{

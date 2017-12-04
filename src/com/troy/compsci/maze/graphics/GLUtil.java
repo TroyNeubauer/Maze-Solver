@@ -1,6 +1,5 @@
 package com.troy.compsci.maze.graphics;
 
-import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 
@@ -33,10 +32,6 @@ public class GLUtil {
 		if (err != GL_NO_ERROR) {
 			System.err.println("Open GL Error detected! " + getError(err) +" Doing " + message);
 		}
-	}
-
-	public static void terminate() {
-		glfwTerminate();
 	}
 
 }

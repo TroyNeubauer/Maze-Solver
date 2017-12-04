@@ -1,10 +1,6 @@
 package com.troy.compsci.maze;
 
-import java.awt.*;
-import java.util.*;
-import java.util.List;
-
-import com.troy.compsci.maze.graphics.*;
+import java.io.*;
 
 /**
 Name: Troy Neubauer
@@ -21,27 +17,10 @@ What I learned:
 
 public class Main
 {
-	public static final int DISPLAY_WIDTH, DISPLAY_HEIGHT;
-	static
-	{//Get the resolution of the default display
-		DisplayMode device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
-		DISPLAY_WIDTH = device.getWidth();
-		DISPLAY_HEIGHT = device.getHeight();
-	}
 	
-	public static void main(String[] args)
+	public static void main(String[] args) throws IOException
 	{
-		SwingOptionsFrame panel = new SwingOptionsFrame();
-		while (true)
-		{
-			MasterRenderer renderer = new MasterRenderer();
-			Maze maze = panel.waitForInformation();
-			renderer.setInfo(maze, panel.getWindowOptions());
-	
-			panel.setVisible(false);//Hide the swing window
-			renderer.waitForFinish();
-			panel.setVisible(true);
-		}
+		MazeSolver solver = new MazeSolver();
 	
 	}
 }

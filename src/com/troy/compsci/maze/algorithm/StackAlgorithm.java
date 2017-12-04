@@ -19,7 +19,7 @@ public class StackAlgorithm extends MazeAlgorithm
 			byte tileId = maze.maze[x + y * maze.width];
 			if (tileId == Maze.VISITED || tileId == Maze.WALL) continue;
 			maze.steps++;
-			if (sleep()) return false;
+			idle();
 			if (x == maze.endX && y == maze.endY)
 			{
 				solved = true;

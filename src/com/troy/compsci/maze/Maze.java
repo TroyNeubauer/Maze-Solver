@@ -1,6 +1,11 @@
 package com.troy.compsci.maze;
 
+import java.util.*;
+import java.util.concurrent.atomic.*;
+
 import javax.swing.*;
+
+import com.troy.compsci.maze.graphics.*;
 
 public class Maze
 {
@@ -16,9 +21,22 @@ public class Maze
 	public final int width, height;
 	private MazeAlgorithm algorithm;
 	public int startX, startY, endX, endY;
-	protected long slowDownMS;
+	protected long slowDownMicroSeconds;
 	public long steps;
 	private Thread thread;
+	public AtomicBoolean working = new AtomicBoolean(false);
+
+	public Maze(byte[] maze, int width, int height, int startX, int startY, int endX, int endY)
+	{
+		this.maze = maze;
+		this.width = width;
+		this.height = height;
+		this.startX = startX;
+		this.startY = startY;
+		this.endX = endX;
+		this.endY = endY;
+		setLocations(startX, startY, endX, endY);
+	}
 
 	/**
 	 * Creates a maze from a pre-existing set of values
@@ -26,12 +44,12 @@ public class Maze
 	 * @param width The width of the maze. Must be consistent with the maze specified
 	 * @param height The height of the maze. Must be consistent with the maze specified
 	 */
-	protected Maze(MazeAlgorithm algorithm, byte[] maze, int width, int height)
+	public Maze(byte[] maze, int width, int height)
 	{
-		this.algorithm = algorithm;
 		this.maze = maze;
 		this.width = width;
 		this.height = height;
+		setLocations(0, 0, width - 1, height - 1);
 	}
 
 	/**
@@ -39,12 +57,12 @@ public class Maze
 	 * @param width The width of the maze to create
 	 * @param height The height of the maze to create
 	 */
-	public Maze(MazeAlgorithm algorithm, int width, int height)
+	public Maze(int width, int height)
 	{
-		this.algorithm = algorithm;
 		this.width = width;
 		this.height = height;
 		this.maze = new byte[width * height];// Because the default value is 0, the maze will be empty with all walkable paths
+		setLocations(0, 0, width - 1, height - 1);
 	}
 
 	public void setLocations(int startX, int startY, int endX, int endY)
@@ -53,28 +71,55 @@ public class Maze
 		this.startY = startY;
 		this.endX = endX;
 		this.endY = endY;
-		maze[startX + startY * width] = START;
-		maze[endX + endY * width] = END;
+		setTileId(startX, startY, START);
+		setTileId(endX, endY, END);
+	}
+	
+	public byte getTileId(int x, int y)
+	{
+		return maze[x + y * width];
+	}
+
+	public void setTileId(int x, int y, byte id)
+	{
+		maze[x + y * width] = id;
 	}
 
 	/**
-	 * 
+	 * @param algorithm the algorithm to set
+	 */
+	public void setAlgorithm(MazeAlgorithm algorithm)
+	{
+		this.algorithm = algorithm;
+	}
+
+	/**
+	 * Solves the maze on a new thread
 	 */
 	public void solve()
 	{
+		if (algorithm == null) throw new NullPointerException();
+		stop();
 		this.thread = new Thread(() ->
 		{
 			long start = System.nanoTime();
 			String result;
+			working.set(true);
 			try
 			{
 				result = algorithm.solve() ? "Solved!" : "No Solution";
+				algorithm.solver.needsRepaint = true;
 			}
 			catch (StackOverflowError e)
 			{
-				System.out.println("stack overflow!");
 				result = "No Solution - Stack Overflow Error!";
 			}
+			catch (StoppedByUserException e)
+			{
+				result = "No Solution - Stopped by user";
+			}
+			working.set(false);
+			algorithm.getSolver().mazeDone();
 
 			long time = System.nanoTime() - start;
 			double seconds = (double) time / 1000000000.0;
@@ -84,15 +129,37 @@ public class Maze
 			message += "Total time taken: " + seconds + " seconds\n";
 			message += "Total steps " + String.format("%,d", steps) + '\n';
 			message += "Average steps per second " + String.format("%,.2f", averageStepsPerSecond) + '\n';
-			message += "With a slowdown of " + slowDownMS + " ms per step" + '\n';
-			JOptionPane.showMessageDialog(null, message, result, JOptionPane.INFORMATION_MESSAGE);
+			message += "With a slowdown of " + (slowDownMicroSeconds / 1000000.0) + " ms per step" + '\n';
+			JOptionPane.showMessageDialog(algorithm.solver, message, result, JOptionPane.INFORMATION_MESSAGE);
 		});
 		thread.start();
 	}
 
 	public void stop()
 	{
-		thread.interrupt();
+		if (thread != null && thread.isAlive())
+		{
+			thread.interrupt();// When the other thread runs idle() it will stop because a StoppedByUserException will be thrown
+			try
+			{
+				Thread.sleep(10);//Give some time for it to die, don't return instantly
+			}
+			catch (InterruptedException e)
+			{
+			}
+		}
+	}
+
+	public void reset()
+	{
+		for (int i = 0; i < width * height; i++)
+		{
+			byte id = maze[i];
+			if (!(id == Maze.WALL || id == Maze.START || id == Maze.END))
+			{
+				maze[i] = Maze.PATH;
+			}
+		}
 	}
 
 }
