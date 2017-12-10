@@ -1,14 +1,19 @@
 package com.troy.compsci.maze;
 
-import java.util.*;
 import java.util.concurrent.atomic.*;
 
 import javax.swing.*;
 
 import com.troy.compsci.maze.graphics.*;
 
+/**
+ * Represents a maze
+ * @author Troy Neubauer
+ *
+ */
 public class Maze
 {
+	//Constants for tile id's
 	public static final byte PATH = 0;
 	public static final byte WALL = 1;
 	public static final byte VISITED = 2;
@@ -17,13 +22,26 @@ public class Maze
 	public static final byte SOLUTION_PATH = 5;
 	public static final byte CLOSED = 6;
 
+	/**
+	 * The maze data, where each index is a tile stored in row major
+	 */
 	public final byte[] maze;// public for fast access in the renderer
+	/**
+	 * Dimensions of the maze
+	 */
 	public final int width, height;
+	//The algorithm that is being used to solve
 	private MazeAlgorithm algorithm;
+	//Info about where to start and end
 	public int startX, startY, endX, endY;
-	protected long slowDownMicroSeconds;
+	
+	//How many microseconds to slow down each iteration by
+	public long slowDownMicroSeconds;
+	//The number of steps that the current algorithm has taken in solving
 	public long steps;
+	//The thread that is solving the maze
 	private Thread thread;
+	//Weather or not the solving thread is working
 	public AtomicBoolean working = new AtomicBoolean(false);
 
 	public Maze(byte[] maze, int width, int height, int startX, int startY, int endX, int endY)
@@ -74,9 +92,10 @@ public class Maze
 		setTileId(startX, startY, START);
 		setTileId(endX, endY, END);
 	}
-	
+
 	public byte getTileId(int x, int y)
 	{
+		if (x < 0 || x >= width || y < 0 || y >= height) return Maze.WALL;
 		return maze[x + y * width];
 	}
 
@@ -102,9 +121,11 @@ public class Maze
 		stop();
 		this.thread = new Thread(() ->
 		{
-			long start = System.nanoTime();
+			//Weather or not we found a solution
 			String result;
 			working.set(true);
+			//The time solving started at
+			long startTime = System.nanoTime();
 			try
 			{
 				result = algorithm.solve() ? "Solved!" : "No Solution";
@@ -119,9 +140,10 @@ public class Maze
 				result = "No Solution - Stopped by user";
 			}
 			working.set(false);
-			algorithm.getSolver().mazeDone();
+			algorithm.getSolver().mazeDone();//Used to change the start/stop button to start because we are done
 
-			long time = System.nanoTime() - start;
+			//Show info to a JOptionPane
+			long time = System.nanoTime() - startTime;
 			double seconds = (double) time / 1000000000.0;
 			double averageStepsPerSecond = steps / seconds;
 			String message = "";
@@ -129,12 +151,15 @@ public class Maze
 			message += "Total time taken: " + seconds + " seconds\n";
 			message += "Total steps " + String.format("%,d", steps) + '\n';
 			message += "Average steps per second " + String.format("%,.2f", averageStepsPerSecond) + '\n';
-			message += "With a slowdown of " + (slowDownMicroSeconds / 1000000.0) + " ms per step" + '\n';
+			message += "With a slowdown of " + (slowDownMicroSeconds / 1000000.0) + " seconds per step" + '\n';
 			JOptionPane.showMessageDialog(algorithm.solver, message, result, JOptionPane.INFORMATION_MESSAGE);
 		});
 		thread.start();
 	}
 
+	/**
+	 * Stops the solving of the maze
+	 */
 	public void stop()
 	{
 		if (thread != null && thread.isAlive())
@@ -142,7 +167,7 @@ public class Maze
 			thread.interrupt();// When the other thread runs idle() it will stop because a StoppedByUserException will be thrown
 			try
 			{
-				Thread.sleep(10);//Give some time for it to die, don't return instantly
+				Thread.sleep(100);//Give some time for it to die, don't return instantly
 			}
 			catch (InterruptedException e)
 			{
@@ -150,6 +175,9 @@ public class Maze
 		}
 	}
 
+	/**
+	 * Resets the maze back to only walls and path
+	 */
 	public void reset()
 	{
 		for (int i = 0; i < width * height; i++)

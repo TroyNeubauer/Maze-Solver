@@ -9,8 +9,7 @@ public class StackAlgorithm extends MazeAlgorithm
 	@Override
 	public boolean solve()
 	{
-		stack.push(maze.startX);
-		stack.push(maze.startY);
+		stack.push(maze.startX, maze.startY);
 		boolean solved = false;
 		while (!stack.isEmpty())
 		{
@@ -18,7 +17,6 @@ public class StackAlgorithm extends MazeAlgorithm
 			if (x < 0 || y < 0 || x >= maze.width || y >= maze.height) continue;
 			byte tileId = maze.maze[x + y * maze.width];
 			if (tileId == Maze.VISITED || tileId == Maze.WALL) continue;
-			maze.steps++;
 			idle();
 			if (x == maze.endX && y == maze.endY)
 			{

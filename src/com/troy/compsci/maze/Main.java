@@ -2,6 +2,8 @@ package com.troy.compsci.maze;
 
 import java.io.*;
 
+import javax.swing.*;
+
 /**
 Name: Troy Neubauer
 Period: 5
@@ -20,7 +22,7 @@ public class Main
 	
 	public static void main(String[] args) throws IOException
 	{
-		MazeSolver solver = new MazeSolver();
+		new MazeSolver();
 	
 	}
 }

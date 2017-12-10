@@ -8,13 +8,21 @@ public class RandomWalls extends MazeType
 
 	public RandomWalls()
 	{
-		super(MazeCreatorPackage.WIDTH_AND_HEIGHT);
+		super(MazeCreatorPackage.WIDTH_AND_HEIGHT, MazeCreatorPackage.WALL_PERCENT);
 	}
 
 	@Override
 	public Maze create()
 	{
-		return MazeCreator.randomWalls(MazeCreatorPackage.WIDTH_AND_HEIGHT.width, MazeCreatorPackage.WIDTH_AND_HEIGHT.height);
+		return MazeCreator.randomWalls(MazeCreatorPackage.WIDTH_AND_HEIGHT.getWidth(), MazeCreatorPackage.WIDTH_AND_HEIGHT.getHeight(), MazeCreatorPackage.WALL_PERCENT.getValue());
 	}
+
+	@Override
+	public void onSelect()
+	{}
+
+	@Override
+	public void onDeSelect()
+	{}
 
 }

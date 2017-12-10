@@ -2,6 +2,12 @@ package com.troy.compsci.maze;
 
 import java.util.*;
 
+/**
+ * Represents a stack using the primitive type {@code int} so that no auto boxing is necessary 
+ * because that yields poor performance.
+ * @author Troy Neubauer
+ *
+ */
 public class MazePositionsStack
 {
 	private int[] values = new int[100];
@@ -9,8 +15,15 @@ public class MazePositionsStack
 
 	public void push(int value)
 	{
-		ensureCapacity(size);
+		ensureCapacity(size + 1);
 		values[size++] = value;
+	}
+	
+	public void push(int x, int y)
+	{
+		ensureCapacity(size + 2);
+		values[size++] = x;
+		values[size++] = y;
 	}
 	
 	public void bigPush(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) {
@@ -37,6 +50,7 @@ public class MazePositionsStack
 
 	private void ensureCapacity(int size)
 	{
+		this.size = this.size < 0 ? 0 : this.size;
 		if (size >= values.length)
 		{
 			values = Arrays.copyOf(values, values.length * 3);

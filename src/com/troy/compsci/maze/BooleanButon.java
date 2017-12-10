@@ -14,6 +14,10 @@ What I learned:
 
 import javax.swing.*;
 
+/**
+ * Represents a button that automatically flips between two values when clicked
+ *
+ */
 public class BooleanButon extends JButton
 {
 	private String trueText, falseText;

@@ -1,6 +1,10 @@
 package com.troy.compsci.maze.gen;
 
+import java.awt.image.*;
+import java.io.*;
 import java.util.*;
+
+import javax.imageio.*;
 
 import com.troy.compsci.maze.*;
 
@@ -31,12 +35,12 @@ public class MazeCreator
 		return new Maze(width, height);
 	}
 
-	public static Maze randomWalls(int width, int height)
+	public static Maze randomWalls(int width, int height, double percentChance)
 	{
 		Maze maze = new Maze(width, height);
 		for (int i = 0; i < width * height; i++)
 		{
-			if (Math.random() < 0.3)
+			if (Math.random() < percentChance / 100.0)
 			{
 				maze.maze[randRange(0, width) + randRange(0, height) * width] = Maze.WALL;
 			}
@@ -160,7 +164,69 @@ public class MazeCreator
 		}
 		return false;
 	}
-	
-	
+
+	/**
+	 * Creates a maze that looks like the image specified
+	 * @param file The image to base the maze off of
+	 * @param width The width of the resulting maze
+	 * @param height The height of the resulting maze
+	 * @param percentWall The percent of the maze that should be wall
+	 * @return A maze representing the image
+	 * @throws IOException If the file can't be read
+	 */
+	public static Maze createImageMaze(File file, int width, int height, double percentWall) throws IOException
+	{
+		double wallRatio = percentWall / 100.0;
+		BufferedImage fromFile = ImageIO.read(file);// Read the image
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);// Create an image thats the desired height
+		image.createGraphics().drawImage(fromFile, 0, 0, width, height, null);//Draw the image onto the one thats the correct height
+		int[] spread = new int[1000];
+		for (int i = 0; i < width * height; i++)
+		{
+			int x = i % width;
+			int y = i / width;
+			int rgb = image.getRGB(x, y);
+			int r = (rgb >> 16) & 0xFF;
+			int g = (rgb >> 8) & 0xFF;
+			int b = (rgb >> 0) & 0xFF;
+			double pixel = getWeightedPixelAverage(r, g, b);
+			int index = (int) (pixel * spread.length);//calculate the index
+			spread[index]++;
+		}
+
+		double max = -1;
+		int total = 0;
+		for (int i = 0; i < spread.length; i++)
+		{
+			total += spread[i];
+			if ((double) total / (double) (width * height) > wallRatio)
+			{
+				max = (double) i / spread.length;
+				break;
+			}
+		}
+		if (max == -1) max = 1.0;
+
+		byte[] mazeData = new byte[width * height];
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				int rgb = image.getRGB(x, y);
+				int r = (rgb >> 16) & 0xFF;
+				int g = (rgb >> 8) & 0xFF;
+				int b = (rgb >> 0) & 0xFF;
+				double pixel = getWeightedPixelAverage(r, g, b);
+				mazeData[x + y * width] = (pixel < max) ? Maze.WALL : Maze.PATH;
+			}
+		}
+
+		return new Maze(mazeData, width, height);
+	}
+
+	private static double getWeightedPixelAverage(int r, int g, int b)
+	{
+		return (0.299 * r / 256.0) + (0.587 * g / 256.0) + (0.114 * b / 256.0);// Parentheses for readability
+	}
 
 }

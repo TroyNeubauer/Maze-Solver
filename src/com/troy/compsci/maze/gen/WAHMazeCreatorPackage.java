@@ -24,14 +24,19 @@ public class WAHMazeCreatorPackage extends MazeCreatorPackage
 {
 	public WAHMazeCreatorPackage()
 	{
-		super("Width And Height Maze");
+		super("Width And Height");
 	}
 
-	private JTextField widthField = new JTextField(5), heightField = new JTextField(5);
-	public int width, height;
+	public JTextField widthField = new JTextField(5), heightField = new JTextField(5);
+	private int width, height;
 
 	public String checkRequiredValues()
 	{
+		if(widthField.getText().isEmpty() &&  heightField.getText().isEmpty()) {
+			width = 50;
+			height = 40;
+			return null;
+		}
 		try
 		{
 			width = Integer.parseInt(this.widthField.getText());
@@ -42,13 +47,13 @@ public class WAHMazeCreatorPackage extends MazeCreatorPackage
 			}
 			else
 			{
-				return "Make sure width and height are positive!";
+				return "Width and height must be positive!";
 			}
 
 		}
 		catch (Exception e)
 		{
-			return "Make sure width must be positive integers!";
+			return "Width and height must be positive integers!";
 		}
 
 	}
@@ -81,4 +86,15 @@ public class WAHMazeCreatorPackage extends MazeCreatorPackage
 		g.gridy = 1;
 		add(heightField, g);
 	}
+	
+	public int getWidth()
+	{
+		return width;
+	}
+	
+	public int getHeight()
+	{
+		return height;
+	}
+	
 }

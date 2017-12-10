@@ -4,6 +4,14 @@ import java.util.*;
 
 import com.troy.compsci.maze.*;
 
+/**
+ * Represents the A-star algorithm
+ * <A href="https://en.wikipedia.org/wiki/A*_search_algorithm">
+ * https://en.wikipedia.org/wiki/A*_search_algorithm
+ * </A>
+ * @author Troy Neubauer
+ *
+ */
 public class AStarAlgorithm extends MazeAlgorithm
 {
 
@@ -26,6 +34,7 @@ public class AStarAlgorithm extends MazeAlgorithm
 				current = current.parent;
 				while (current != null)
 				{
+					if (current.x == maze.startX && current.y == startY) break;
 					maze.maze[current.x + current.y * maze.width] = Maze.SOLUTION_PATH;
 					current = current.parent;
 				}
@@ -34,7 +43,6 @@ public class AStarAlgorithm extends MazeAlgorithm
 			maze.maze[x + y * width] = Maze.CLOSED;//mark as closed because we are done with this one
 
 			idle();
-			maze.steps++;
 
 			Node neighbor;//try to create new neighbors
 			for (int i = 0; i < 4; i++)
@@ -120,7 +128,7 @@ public class AStarAlgorithm extends MazeAlgorithm
 		 */
 		public void calculateFCost()
 		{
-			this.fCost = gCost * 0.9 + hCost;
+			this.fCost = gCost * 0.7 + hCost;
 		}
 
 		/* (non-Javadoc)

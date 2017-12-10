@@ -14,6 +14,8 @@ public abstract class MazeCreatorPackage extends JPanel
 	public static final FileMazeCreatorPackage FILE = new FileMazeCreatorPackage();
 
 	public static final WAHMazeCreatorPackage WIDTH_AND_HEIGHT = new WAHMazeCreatorPackage();
+	
+	public static final WallPercentPackage WALL_PERCENT = new WallPercentPackage();
 
 	static
 	{
@@ -29,6 +31,7 @@ public abstract class MazeCreatorPackage extends JPanel
 		int i = 0;
 		for (Field field : MazeCreatorPackage.class.getDeclaredFields())
 		{
+			field.setAccessible(true);
 			if (Modifier.isStatic(field.getModifiers()) && MazeCreatorPackage.class.isAssignableFrom(field.getType()))
 			{
 				try

@@ -6,12 +6,15 @@ import java.util.List;
 
 import javax.swing.*;
 
+import org.apache.commons.lang3.exception.*;
+
 import com.troy.compsci.maze.*;
 
 public class CreateNewMazeFrame extends JFrame
 {
 
 	private JComboBox<MazeType> mazeTypeBox = new JComboBox<MazeType>();
+	private MazeType lastType;
 	private JButton createMaze = new JButton("Create Maze");
 	private JPanel bigPanel = new JPanel(new BorderLayout()), center = new JPanel(new GridBagLayout());
 	private MazeSolver solver;
@@ -32,11 +35,13 @@ public class CreateNewMazeFrame extends JFrame
 		g.insets = new Insets(20, 20, 20, 20);
 		for (MazeCreatorPackage pack : MazeCreatorPackage.PACKAGES)
 		{
+			System.out.println(pack);
 			pack.setBorder(BorderFactory.createTitledBorder(pack.getName()));
 			pack.addComponets(new GridBagConstraints());
 			center.add(pack, g);
 			g.gridy++;
 		}
+		center.validate();
 		bigPanel.add(mazeTypeBox, BorderLayout.NORTH);
 		bigPanel.add(center, BorderLayout.CENTER);
 		bigPanel.add(createMaze, BorderLayout.SOUTH);
@@ -50,15 +55,18 @@ public class CreateNewMazeFrame extends JFrame
 			List<MazeCreatorPackage> allPackages = new ArrayList<MazeCreatorPackage>();
 			for (MazeCreatorPackage pack : MazeCreatorPackage.PACKAGES)
 				allPackages.add(pack);
-			
+
 			for (MazeCreatorPackage pack : type.packages)
 				allPackages.remove(allPackages.indexOf(pack));
 
-			for (MazeCreatorPackage pack : allPackages)
+			for (MazeCreatorPackage pack : MazeCreatorPackage.PACKAGES)
 				pack.disableAllComponents();
 
 			for (MazeCreatorPackage pack : type.packages)
 				pack.enableAllComponents();
+			if (lastType != null) lastType.onDeSelect();
+			type.onSelect();
+			lastType = type;
 
 		});
 		mazeTypeBox.setSelectedIndex(0);
@@ -90,7 +98,8 @@ public class CreateNewMazeFrame extends JFrame
 		}
 		catch (Exception e)
 		{
-
+			System.out.println("Unable to create maze!");
+			System.out.println(ExceptionUtils.getMessage(e));
 		}
 
 	}

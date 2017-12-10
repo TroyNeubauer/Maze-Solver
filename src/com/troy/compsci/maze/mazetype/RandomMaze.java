@@ -14,7 +14,15 @@ public class RandomMaze extends MazeType
 	@Override
 	public Maze create()
 	{
-		return MazeCreator.randomMaze(MazeCreatorPackage.WIDTH_AND_HEIGHT.width, MazeCreatorPackage.WIDTH_AND_HEIGHT.height);
+		return MazeCreator.randomMaze(MazeCreatorPackage.WIDTH_AND_HEIGHT.getWidth(), MazeCreatorPackage.WIDTH_AND_HEIGHT.getHeight());
 	}
+
+	@Override
+	public void onSelect()
+	{}
+
+	@Override
+	public void onDeSelect()
+	{}
 
 }

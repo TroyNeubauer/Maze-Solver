@@ -16,4 +16,12 @@ public class LauMaze extends MazeType
 		return MazeCreator.defaultLauMaze();
 	}
 
+	@Override
+	public void onSelect()
+	{}
+
+	@Override
+	public void onDeSelect()
+	{}
+
 }

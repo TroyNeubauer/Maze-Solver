@@ -5,12 +5,27 @@ import java.util.zip.*;
 
 import org.apache.commons.io.*;
 
+/**
+ * Contains some static methods for reading and writing mazes to and from files
+ * A maze file 
+ *
+ */
 public class MazeEncoding
 {
+	//Constants for when the maze is stored in a file
 	private static final byte PATH = 0, WALL = 1;
+	//This will always be the first byte of a maze file. 
+	//If a file's first byte isan't this one, we know it isan't a maze file
 	private static final byte HEADER = 'M';
+	//The file extension to use when saving files
 	public static final String EXTENSION = "maze";
 
+	/**
+	 * Returns the maze stored in file {@code file} or throws an {@link IOException} if the file cannot be read or isn't a valid maze file
+	 * @param file The file to read from
+	 * @return The maze stored in the file
+	 * @throws IOException If the file cannot be read
+	 */
 	public static Maze readMaze(File file) throws IOException
 	{
 		int width, height, startX, startY, endX, endY;
@@ -19,10 +34,9 @@ public class MazeEncoding
 		FileInputStream stream = new FileInputStream(file);
 		try
 		{
-
 			byte firstByte = (byte) stream.read();
-			if (firstByte != HEADER) throw new IOException("Non maze file: " + file + ". File doesn't start with " + HEADER
-					+ " as the first byte! First byte: " + firstByte);
+			if (firstByte != HEADER) throw new IOException("Non maze file: " + file + ". File doesn't start with 0x" + Integer.toHexString(HEADER)
+					+ " as the first byte! First byte: 0x" + Integer.toHexString(firstByte));
 			width = read3ByteInt(stream);
 			height = read3ByteInt(stream);
 
@@ -31,14 +45,14 @@ public class MazeEncoding
 			endX = read3ByteInt(stream);
 			endY = read3ByteInt(stream);
 
-			byte[] compressedMazeData = IOUtils.toByteArray(stream);
-			stream.close();
+			byte[] compressedMazeData = IOUtils.toByteArray(stream);//The remainder of the file is maze data so read all of it
+			stream.close();//Close the file
 
-			mazeData = toBigFormat(decompress(compressedMazeData), width, height);
+			mazeData = toBigFormat(decompress(compressedMazeData));
 		}
 		catch (Exception e)
 		{
-			throw new IOException("Unable to read maze!", e);
+			throw e;
 		}
 		finally
 		{
@@ -48,10 +62,16 @@ public class MazeEncoding
 		return new Maze(mazeData, width, height, startX, startY, endX, endY);
 	}
 
+	/**
+	 * Writes a maze to a file, overwriting the file if it already exists
+	 * @param maze The maze to write
+	 * @param dest The file to write to 
+	 * @throws IOException If some I/O error occurs while writing to the file
+	 */
 	public static void writeMaze(Maze maze, File dest) throws IOException
 	{
 		String file = dest.getName();
-		if (FilenameUtils.getExtension(file) != EXTENSION)
+		if (FilenameUtils.getExtension(file) != EXTENSION)//Set the file to have the .maze extension if it doesn't already
 		{
 			int dot = file.lastIndexOf('.');
 			dest = new File(dest.getParentFile(), file.substring(0, (dot == -1) ? file.length() : dot) + '.' + EXTENSION);
@@ -73,21 +93,32 @@ public class MazeEncoding
 		stream.close();
 	}
 
+	/**
+	 * Converts byte maze data to bit maze data
+	 * @param maze The maze data to make into bit
+	 * @return Bit maze data representing the inputed maze
+	 */
 	private static byte[] toSmallFormat(Maze maze)
 	{
-		byte[] bitMazeData = new byte[(maze.width * maze.height + 7) / Byte.SIZE];
-		for (int i = 0; i < maze.maze.length; i++)
+		byte[] mazeData = maze.maze;//cache for faster access
+		byte[] bitMazeData = new byte[(maze.width * maze.height + Byte.SIZE - 1) / Byte.SIZE];//Rounds up
+		for (int i = 0; i < mazeData.length; i++)
 		{
 			int bitIndex = (Byte.SIZE - 1) - i % Byte.SIZE;// Which bit this binary value (wall or not) should go into in the byte
-			int value = ((maze.maze[i] == Maze.WALL) ? WALL : PATH) << bitIndex;// the value of this tile properly stored in the byte
+			int value = ((mazeData[i] == Maze.WALL) ? WALL : PATH) << bitIndex;// the value of this tile properly stored in the byte
 			bitMazeData[i / Byte.SIZE] |= value;
 		} // Bit maze data efficiently stores the entire maze using 8X less memory!
 		return bitMazeData;
 	}
 
-	private static byte[] toBigFormat(byte[] bitMazeData, int mazeWidth, int mazeHeight)
+	/**
+	 * Converts a maze data where each bit is one tile, to maze data where each byte is a tile
+	 * @param bitMazeData The data to expand
+	 * @return Maze data that can be passed into a maze object
+	 */
+	private static byte[] toBigFormat(byte[] bitMazeData)
 	{
-		int tiles = mazeWidth * mazeHeight;
+		int tiles = bitMazeData.length * Byte.SIZE;
 		byte[] result = new byte[tiles];
 		for (int i = 0; i < tiles; i++)
 		{
@@ -98,6 +129,11 @@ public class MazeEncoding
 		return result;
 	}
 
+	/**
+	 * Compresses data using Deflater compression
+	 * @param src The uncompressed data to compress
+	 * @return Compressed data
+	 */
 	private static byte[] compress(byte[] src)
 	{
 		try
@@ -115,6 +151,11 @@ public class MazeEncoding
 		}
 	}
 
+	/**
+	 * Decompresses the given byte array from deflater compression to uncompressed
+	 * @param src Deflater compressed data
+	 * @return The uncompressed data
+	 */
 	private static byte[] decompress(byte[] src)
 	{
 		try
@@ -124,26 +165,30 @@ public class MazeEncoding
 		}
 		catch (IOException e)
 		{
-			throw new RuntimeException("Unexpected IOException while compressing!", e);
+			throw new RuntimeException("Unexpected IOException while decompressing!", e);
 		}
 	}
 
-	private static String toBinaryString(int value)
-	{
-		if (value < (int) Math.pow(2, 8)) return "" + ((value >> 7) & 0x1) + ((value >> 6) & 0x1) + ((value >> 5) & 0x1) + ((value >> 4) & 0x1)
-				+ ((value >> 3) & 0x1) + ((value >> 2) & 0x1) + ((value >> 1) & 0x1) + ((value >> 0) & 0x1);
-		return "";
-
-	}
-
+	/**
+	 * Reads a three byte integer from the desired input stream
+	 * @param stream The stream to read from
+	 * @return The integer read
+	 * @throws IOException If some I/O error happens while reading
+	 */
 	private static int read3ByteInt(FileInputStream stream) throws IOException
 	{
 		return (stream.read() << 16) | (stream.read() << 8) | (stream.read() << 0);
 	}
 
+	/**
+	 * Writes an integer as three bytes to the specified output stream
+	 * @param stream The stream to write to
+	 * @param value The integer to write
+	 * @throws IOException If some I/O error occurs while writing the value
+	 */
 	private static void write3ByteInt(FileOutputStream stream, int value) throws IOException
 	{
-		assert value < (int) Math.pow(2, 8 * 3);//make sure value can be represented in 3 bytes
+		assert value < (int) Math.pow(2, Byte.SIZE * 3);//make sure value can be represented in 3 bytes
 		stream.write(value >> 16);
 		stream.write(value >> 8);
 		stream.write(value >> 0);

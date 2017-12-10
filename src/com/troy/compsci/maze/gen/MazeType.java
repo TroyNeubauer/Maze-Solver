@@ -13,6 +13,7 @@ public abstract class MazeType
 
 	static
 	{
+		//Scan for all sub clases and automatically put them in values
 		List<String> classes = new FastClasspathScanner(EmptyMaze.class.getPackage().getName()).scan(1).getNamesOfSubclassesOf(MazeType.class);
 		values = new ArrayList<MazeType>();
 		for (String clazz : classes)
@@ -66,4 +67,14 @@ public abstract class MazeType
 	{
 		return values;
 	}
+
+	/**
+	 * Called when this maze type is selected
+	 */
+	public abstract void onSelect();
+
+	/**
+	 * 
+	 */
+	public abstract void onDeSelect();
 }

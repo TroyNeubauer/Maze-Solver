@@ -4,8 +4,6 @@ import com.troy.compsci.maze.*;
 
 public class RecursiveAlgorithm extends MazeAlgorithm
 {
-
-
 	@Override
 	public boolean solve()
 	{
@@ -18,7 +16,6 @@ public class RecursiveAlgorithm extends MazeAlgorithm
 		byte tileId = maze.maze[x + y * maze.width];
 		if (tileId == Maze.VISITED || tileId == Maze.WALL) return false;
 		idle();
-		maze.steps++;
 		if (x == maze.endX && y == maze.endY) return true;//Return true if were at the end
 		if (tileId != Maze.START) maze.maze[x + y * maze.width] = Maze.VISITED;//Don't mark the starting square as visited
 		boolean result = findAnExitHelper(x + 1, y) || findAnExitHelper(x - 1, y) || findAnExitHelper(x, y + 1) || findAnExitHelper(x, y - 1);

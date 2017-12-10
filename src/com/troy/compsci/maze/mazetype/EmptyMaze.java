@@ -14,7 +14,16 @@ public class EmptyMaze extends MazeType
 	@Override
 	public Maze create()
 	{
-		return MazeCreator.emptyMaze(MazeCreatorPackage.WIDTH_AND_HEIGHT.width, MazeCreatorPackage.WIDTH_AND_HEIGHT.height);
+		return MazeCreator.emptyMaze(MazeCreatorPackage.WIDTH_AND_HEIGHT.getWidth(), MazeCreatorPackage.WIDTH_AND_HEIGHT.getHeight());
 	}
+
+
+	@Override
+	public void onSelect()
+	{}
+
+	@Override
+	public void onDeSelect()
+	{}
 
 }

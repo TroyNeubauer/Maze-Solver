@@ -1,25 +1,12 @@
 package com.troy.compsci.maze;
-/**
-Name: Troy Neubauer
-Peroid: 5
-Name of the lab: Lab (MazeFileFilter.java)
-Due Date: 
-Date Submitted:
-What I learned:
-   a. 
-      
-   b. 
-      
-*/
 
 import java.io.*;
 
-import javax.swing.filechooser.*;
 import javax.swing.filechooser.FileFilter;
 
 /**
  * @author Troy Neubauer
- *
+ * Used to select only mazes
  */
 public class MazeFileFilter extends FileFilter
 {
@@ -27,9 +14,9 @@ public class MazeFileFilter extends FileFilter
 	@Override
 	public boolean accept(File f)
 	{
-		return f.getName().endsWith("maze");
+		return f.getName().endsWith("maze") || f.getName().endsWith("png") || f.getName().endsWith("jpeg") || f.getName().endsWith("bmp")
+				|| f.getName().endsWith("gif");
 	}
-
 
 	@Override
 	public String getDescription()
