@@ -38,10 +38,12 @@ public class CreateNewMazeFrame extends JFrame
 			System.out.println(pack);
 			pack.setBorder(BorderFactory.createTitledBorder(pack.getName()));
 			pack.addComponets(new GridBagConstraints());
+			pack.validate();
 			center.add(pack, g);
 			g.gridy++;
 		}
-		center.validate();
+		center.setVisible(true);
+		System.out.println(center.getComponentCount());
 		bigPanel.add(mazeTypeBox, BorderLayout.NORTH);
 		bigPanel.add(center, BorderLayout.CENTER);
 		bigPanel.add(createMaze, BorderLayout.SOUTH);
