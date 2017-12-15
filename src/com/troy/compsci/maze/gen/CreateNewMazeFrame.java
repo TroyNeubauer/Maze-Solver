@@ -35,12 +35,15 @@ public class CreateNewMazeFrame extends JFrame
 		g.insets = new Insets(20, 20, 20, 20);
 		for (MazeCreatorPackage pack : MazeCreatorPackage.PACKAGES)
 		{
+			//if(pack == MazeCreatorPackage.FILE) return;
 			System.out.println(pack);
+			center.add(pack, g);
 			pack.setBorder(BorderFactory.createTitledBorder(pack.getName()));
 			pack.addComponets(new GridBagConstraints());
-			pack.validate();
-			center.add(pack, g);
 			g.gridy++;
+		}
+		for(Component c : center.getComponents()) {
+			System.out.println("aesf" +c);
 		}
 		center.setVisible(true);
 		System.out.println(center.getComponentCount());
