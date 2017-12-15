@@ -87,7 +87,7 @@ public class MazeSolver extends JFrame
 				{
 					int tileX = e.getX() * maze.width / canvas.getWidth();
 					int tileY = e.getY() * maze.height / canvas.getHeight();
-					if (canEdit)
+					if (canEdit && !(tileX == maze.startX && tileY == maze.startY || tileX == maze.endX && tileY == maze.endY))
 					{
 						maze.setTileId(tileX, tileY, SwingUtilities.isLeftMouseButton(e) ? Maze.PATH : Maze.WALL);
 						needsRepaint = true;
@@ -101,7 +101,7 @@ public class MazeSolver extends JFrame
 				{
 					int tileX = e.getX() * maze.width / canvas.getWidth();
 					int tileY = e.getY() * maze.height / canvas.getHeight();
-					if (canEdit)
+					if (canEdit && !(tileX == maze.startX && tileY == maze.startY || tileX == maze.endX && tileY == maze.endY))
 					{
 						byte id = maze.getTileId(tileX, tileY);
 						maze.setTileId(tileX, tileY, (id == Maze.WALL) ? Maze.PATH : Maze.WALL);

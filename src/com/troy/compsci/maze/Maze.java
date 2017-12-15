@@ -183,11 +183,13 @@ public class Maze
 		for (int i = 0; i < width * height; i++)
 		{
 			byte id = maze[i];
-			if (!(id == Maze.WALL || id == Maze.START || id == Maze.END))
+			if (id != Maze.WALL)
 			{
 				maze[i] = Maze.PATH;
 			}
 		}
+		maze[startX + startY * width] = Maze.START;
+		maze[endX + endY * width] = Maze.END;
 	}
 
 }

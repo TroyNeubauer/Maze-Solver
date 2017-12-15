@@ -22,7 +22,7 @@ public abstract class MazeCreatorPackage extends JPanel
 		int count = 0;
 		for (Field field : MazeCreatorPackage.class.getDeclaredFields())
 		{
-			if (Modifier.isStatic(field.getModifiers()) && MazeCreatorPackage.class.isAssignableFrom(field.getType()))
+			if (Modifier.isStatic(field.getModifiers()) && MazeCreatorPackage.class.isAssignableFrom(field.getType()) && field.getType() == WAHMazeCreatorPackage.class)
 			{
 				count++;
 			}
@@ -32,7 +32,7 @@ public abstract class MazeCreatorPackage extends JPanel
 		for (Field field : MazeCreatorPackage.class.getDeclaredFields())
 		{
 			field.setAccessible(true);
-			if (Modifier.isStatic(field.getModifiers()) && MazeCreatorPackage.class.isAssignableFrom(field.getType()))
+			if (Modifier.isStatic(field.getModifiers()) && MazeCreatorPackage.class.isAssignableFrom(field.getType()) && field.getType() == WAHMazeCreatorPackage.class)
 			{
 				try
 				{
